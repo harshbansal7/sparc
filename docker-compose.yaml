@@ -1,0 +1,32 @@
+version: '3'
+services:
+  api:
+    build: ./api
+    ports:
+      - "5005:5005"
+    depends_on:
+      - service1
+      - service2
+      - service3
+      - postgres
+  service1:
+    build: ./service1
+    depends_on:
+      - postgres
+  service2:
+    build: ./service2
+    depends_on:
+      - postgres
+  service3:
+    build: ./service3
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: your_username
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: your_database_name
+    ports:
+      - "5432:5432"
