@@ -55,17 +55,38 @@ class Complaint:
 
     def setPredictedCategory(self, predictedCategory):
         self.ComplaintCategory = predictedCategory
+        return True
 
-@app.route('/process_input', methods=['POST'])
-def process_input():
+    def getDictionary(self, includeUserData=True):
+        local_dict = {
+            'complaint_data' : {
+                'original': self.OriginalComplaint,
+                'language': self.Language,
+                'description': self.Description,
+                'coordinatex': self.CoordinateX,
+                'coordinatey': self.CoordinateY,
+                'complaint_category': self.ComplaintCategory,
+            }
+        }
+
+        if includeUserData:
+            local_dict['user_data'] = {
+                'username':self.User.UserName,
+                'useremail':self.User.UserEmail,
+                'userphone':self.User.UserPhone,
+            }
+        
+        return jsonify(local_dict)
+
+@app.route('/process_complaint', methods=['POST'])
+def process_complaint():
     form = ComplaintRequest(request.form)
     
     # Check Request Data Validation
     if not form.validate():
         errors = form.errors
         return jsonify({"errors": errors}), 400
-    
-    
+
     if 'audiofile' in request.files:
         audiofile = request.files['audiofile']
         with NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
@@ -90,7 +111,7 @@ def process_input():
         ComplaintCategory = complaint_category_prediction(processed_complaintText)
         complaint_object.setPredictedCategory(ComplaintCategory)
             
-        return jsonify(complaint_object.ComplaintCategory)
+        return complaint_object.getDictionary()
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

@@ -2,8 +2,8 @@ from flask import Flask, jsonify
 
 app = Flask(__name__)
 
-@app.route('/data')
-def get_data():
+@app.route('/queue_complaint', methods=['POST'])
+def queue_complaint():
     return jsonify({"message": "Data from Microservice 2"})
 
 if __name__ == '__main__':
