@@ -1,3 +1,4 @@
+import json
 from flask import Flask, jsonify, request
 import requests
 
@@ -22,8 +23,8 @@ def service1_complaint_processing():
     if response.status_code == 400:
         return response.json()
 
-    queue_response = requests.post(SERVICE_2_URL + '/queue_complaint', data=response)
-
+    queue_response = requests.post(SERVICE_2_URL + '/queue_complaint', json=response.json())
+    
     return queue_response.json()
 
 # @app.route('/api/service2/queue-complaint')

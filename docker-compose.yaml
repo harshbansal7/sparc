@@ -9,18 +9,30 @@ services:
       - service2
       - service3
       - postgres
+    volumes:
+      - ./api:/app
+
   service1:
     build: ./service1
     depends_on:
       - postgres
+    volumes:
+      - ./service1:/app
+
   service2:
     build: ./service2
     depends_on:
       - postgres
+    volumes:
+      - ./service2:/app
+
   service3:
     build: ./service3
     depends_on:
       - postgres
+    volumes:
+      - ./service3:/app
+
   postgres:
     image: postgres
     restart: always
