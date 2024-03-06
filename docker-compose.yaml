@@ -23,6 +23,8 @@ services:
     build: ./service2
     depends_on:
       - postgres
+    environment:
+      - DB_URL=postgresql://postgres:postgres@postgres:5432/postgres
     volumes:
       - ./service2:/app
 
@@ -37,8 +39,13 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_USER: your_username
-      POSTGRES_PASSWORD: your_password
-      POSTGRES_DB: your_database_name
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata: {}

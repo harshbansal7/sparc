@@ -113,5 +113,22 @@ def process_complaint():
             
         return complaint_object.getDictionary()
     
+        # SAMPLE OUTPUT
+        # {
+        #     "complaint_data": {
+        #         "complaint_category": "ASSAULT AND THREAT",
+        #         "coordinatex": "10.550",
+        #         "coordinatey": "20.2003",
+        #         "description": "The accused allegedly assaulted the complainant with a wooden stick and threatened to kill him.",
+        #         "language": "en",
+        #         "original": "The accused allegedly assaulted the complainant with a wooden stick and threatened to kill him."
+        #     },
+        #     "user_data": {
+        #         "useremail": "harsh@gmail.com",
+        #         "username": "Harsh",
+        #         "userphone": 1000101
+        #     }
+        # }
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
