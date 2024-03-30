@@ -81,19 +81,24 @@ def queue_complaint():
             if not status:
                 MessageQueue.append(packet)
                 message_status = "QUEUED"
-
             else:
                 message_status = "SENT"
     
     # class Complaint(db.Model):
     #     __tablename__ = "complaint"
     #     id = db.Column(db.Integer, primary_key=True)
+    #     # Complaint Data
     #     complaint_category = db.Column(db.String(100))
     #     coordinatex = db.Column(db.String(20))
     #     coordinatey = db.Column(db.String(20))
     #     original = db.Column(db.String(500))
     #     description = db.Column(db.String(500))
     #     language = db.Column(db.String(3))
+    #     # User Data
+    #     username = db.Column(db.String(100))
+    #     useremail = db.Column(db.String(100))
+    #     userphone = db.Column(db.String(12))
+
     complaint_db_entry = Complaint(
         complaint_category = complaint_data['complaint_category'],
         coordinatex = complaint_data['coordinatex'],
@@ -101,14 +106,24 @@ def queue_complaint():
         original = complaint_data['original'],
         description = complaint_data['description'],
         language = complaint_data['language'],
+        username = user_data['username'],
+        useremail = user_data['useremail'],
+        userphone = user_data['userphone']
     )
+
     db.session.add(complaint_db_entry)
     db.session.commit()
 
-    return jsonify({"message": complaint_db_entry.id})
+    return jsonify({
+        "status": message_status,
+        "allocated_to": receiver_details['official'], 
+        "message": f"Complaint has been lodged with ID - {complaint_db_entry.id}. You will be contacted soon for a follow-up."
+    })
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002, debug=True)
