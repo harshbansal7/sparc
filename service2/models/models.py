@@ -17,3 +17,5 @@ class Complaint(db.Model):
     username = db.Column(db.String(100))
     useremail = db.Column(db.String(100))
     userphone = db.Column(db.String(12))
+    # Message Data
+    status = db.Column(db.String(100))

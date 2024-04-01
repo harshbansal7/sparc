@@ -14,6 +14,11 @@ SERVICE_3_URL = "http://service3:5003"
 def normal():
     return jsonify("API is Running!")
 
+@app.route('/incoming_message', methods=['POST'])
+def incoming_message():
+    response = requests.post(SERVICE_2_URL + '/process_incoming_message', data=request.form) 
+    return response.json()
+
 @app.route('/api/service1/complaint', methods=['POST'])
 def service1_complaint_processing():
     data = request.form  

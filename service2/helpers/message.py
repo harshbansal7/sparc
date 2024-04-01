@@ -1,6 +1,7 @@
-def message_helper(receiver_details, complaint_data, user_data):
+def message_helper(complaint_id, receiver_details, complaint_data, user_data):
     
     formatted_string = (
+    "*Complaint ID* - {}\n\n"    
     "*Complaint Category:*\n{}\n\n"
     "*Allotted To:*\n{}\n\n"
     "*Original Complaint:*\n{}\n\n"
@@ -9,6 +10,7 @@ def message_helper(receiver_details, complaint_data, user_data):
     "*Complainant Phone:*\n{}\n\n"
     # "*Entities:*\n{}"
     ).format(
+        complaint_id,
         complaint_data["complaint_category"],
         receiver_details["official"],
         complaint_data["original"],

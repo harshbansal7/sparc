@@ -58,6 +58,31 @@ allotment = {
     },
 }
 
+@app.route('/process_incoming_message', methods=['POST'])
+def process_incoming_message():
+    msgBody = str(request.form.to_dict()['Body'])
+    complaint_id, status, remarks, *kwargs = msgBody.split(" ")
+
+    if status.lower() == 'solved':
+        complaint = db.session.get(Complaint, complaint_id)
+        
+        if not complaint:
+            # Complaint Not Found or Key Invalid 
+            return jsonify({'ERROR' : 'Complaint Not Found'})
+        
+        complaint.status = "SOLVED"
+
+        dispatch_message_to_whatsapp(
+            f"Your Complaint registered with ID - *{complaint_id}* alloted to *{allotment[complaint.complaint_category]['official']}* has been resolved.",
+            "+91" + str(complaint.userphone)
+        )
+
+        db.session.commit()
+
+        return jsonify("SUCCESS")
+    
+    return jsonify("FAILED")
+
 @app.route('/queue_complaint', methods=['POST'])
 def queue_complaint():
     complaint_data = request.json['complaint_data'] 
@@ -66,24 +91,50 @@ def queue_complaint():
     receiver_details = allotment.get(complaint_data['complaint_category'], None)
 
     if receiver_details:
-        message = message_helper(receiver_details, complaint_data, user_data=None)
-        
-        packet = [message, receiver_details['contactno']]
-        
-        message_status = "PENDING"
 
-        if len(MessageQueue) != 0:
-            MessageQueue.append(packet)
-            message_status = "QUEUED"
-        else:
-            status = dispatch_message_to_whatsapp(packet)
+        complaint_db_entry = Complaint(
+            complaint_category = complaint_data['complaint_category'],
+            coordinatex = complaint_data['coordinatex'],
+            coordinatey = complaint_data['coordinatey'],
+            original = complaint_data['original'],
+            description = complaint_data['description'],
+            language = complaint_data['language'],
+            username = user_data['username'],
+            useremail = user_data['useremail'],
+            userphone = user_data['userphone'],
+            status = 'LODGED',
+        )
 
-            if not status:
-                MessageQueue.append(packet)
-                message_status = "QUEUED"
-            else:
-                message_status = "SENT"
+        db.session.add(complaint_db_entry)
+
+        db.session.commit()
+
+        message = message_helper(complaint_db_entry.id, receiver_details, complaint_data, user_data=None)
+                
+        status = dispatch_message_to_whatsapp(message, receiver_details['contactno'])
+
+        # message_status = "PENDING"
+
+        # if len(MessageQueue) != 0:
+        #     MessageQueue.append(packet)
+        #     message_status = "QUEUED"
+        # else:
+        #     status = dispatch_message_to_whatsapp(packet)
+
+        #     if not status:
+        #         MessageQueue.append(packet)
+        #         message_status = "QUEUED"
+        #     else:
+        #         message_status = status
+
     
+
+    return jsonify({
+        "status": status,
+        "allocated_to": receiver_details['official'], 
+        "message": f"Complaint has been lodged with ID - {complaint_db_entry.id}. You will be contacted soon for a follow-up."
+    })
+
     # class Complaint(db.Model):
     #     __tablename__ = "complaint"
     #     id = db.Column(db.Integer, primary_key=True)
@@ -99,31 +150,14 @@ def queue_complaint():
     #     useremail = db.Column(db.String(100))
     #     userphone = db.Column(db.String(12))
 
-    complaint_db_entry = Complaint(
-        complaint_category = complaint_data['complaint_category'],
-        coordinatex = complaint_data['coordinatex'],
-        coordinatey = complaint_data['coordinatey'],
-        original = complaint_data['original'],
-        description = complaint_data['description'],
-        language = complaint_data['language'],
-        username = user_data['username'],
-        useremail = user_data['useremail'],
-        userphone = user_data['userphone']
-    )
-
-    db.session.add(complaint_db_entry)
-    db.session.commit()
-
-    return jsonify({
-        "status": message_status,
-        "allocated_to": receiver_details['official'], 
-        "message": f"Complaint has been lodged with ID - {complaint_db_entry.id}. You will be contacted soon for a follow-up."
-    })
-
 with app.app_context():
     db.drop_all()
     db.create_all()
 
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002, debug=True)
+
+# Things left to add-
+# 1. Status of Complaint RESOLUTION Data in the Database, how do we know if it has been resolved or not.
+# 2. Queue Functionality
+# 3. Better way of managing complaint delivery status...still thinking
