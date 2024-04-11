@@ -61,7 +61,7 @@ allotment = {
 @app.route('/process_incoming_message', methods=['POST'])
 def process_incoming_message():
     msgBody = str(request.form.to_dict()['Body'])
-    complaint_id, status, remarks, *kwargs = msgBody.split(" ")
+    complaint_id, status, *remarks = msgBody.split(" ")
 
     if status.lower() == 'solved':
         complaint = db.session.get(Complaint, complaint_id)
@@ -89,7 +89,7 @@ def queue_complaint():
     user_data = request.json['user_data']
 
     receiver_details = allotment.get(complaint_data['complaint_category'], None)
-
+    
     if receiver_details:
 
         complaint_db_entry = Complaint(
@@ -99,9 +99,11 @@ def queue_complaint():
             original = complaint_data['original'],
             description = complaint_data['description'],
             language = complaint_data['language'],
+
             username = user_data['username'],
             useremail = user_data['useremail'],
             userphone = user_data['userphone'],
+            
             status = 'LODGED',
         )
 
@@ -112,6 +114,11 @@ def queue_complaint():
         message = message_helper(complaint_db_entry.id, receiver_details, complaint_data, user_data=None)
                 
         status = dispatch_message_to_whatsapp(message, receiver_details['contactno'])
+
+        confirmation = dispatch_message_to_whatsapp(
+            f"""Your Complaint has been received by the {receiver_details["official"]} and will be responded to very shortly.\n\nYou may use this for your reference: *Complaint ID - {complaint_db_entry.id}*\n\nYou may reply to this message to give your feedback on the service.""",
+            "+91" + str(user_data['userphone'])
+        )
 
         # message_status = "PENDING"
 
