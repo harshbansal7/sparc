@@ -12,8 +12,8 @@ class ComplaintRequest(Form):
     useremail = StringField('useremail', [validators.Length(min=6, max=35), validators.InputRequired()])
     userphone = IntegerField('userphone', [validators.InputRequired()])
     complaint = StringField('complaint', [validators.InputRequired(), validators.Length(min=10, max=500)])
-    cdx = DecimalField('cdx', places=2)
-    cdy = DecimalField('cdy', places=2)
+    latitude = DecimalField('latitude', places=2)
+    longitude = DecimalField('longitude', places=2)
 
 class User:
     def __init__(self, name, phone, email):
@@ -47,8 +47,8 @@ class Complaint:
             self.Description = complaint
 
         # self.description is the final usable complaint (in english)
-        self.CoordinateX = x
-        self.CoordinateY = y
+        self.latitude = x
+        self.longitude = y
         self.AudioFile = audio_file
 
         self.ComplaintCategory = None
@@ -63,8 +63,8 @@ class Complaint:
                 'original': self.OriginalComplaint,
                 'language': self.Language,
                 'description': self.Description,
-                'coordinatex': self.CoordinateX,
-                'coordinatey': self.CoordinateY,
+                'latitude': self.latitude,
+                'longitude': self.longitude,
                 'complaint_category': self.ComplaintCategory,
             }
         }
@@ -99,8 +99,8 @@ def process_complaint():
         complaint_object = Complaint(
             user = User(form.username.data, form.userphone.data, form.useremail.data),
             complaint= form.complaint.data,
-            x = form.cdx.data,
-            y = form.cdy.data,
+            x = form.latitude.data,
+            y = form.longitude.data,
         )
 
         processed_complaintText = clean_text(complaint_object.Description)

@@ -8,8 +8,8 @@ class Complaint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Complaint Data
     complaint_category = db.Column(db.String(100))
-    coordinatex = db.Column(db.String(20))
-    coordinatey = db.Column(db.String(20))
+    latitude = db.Column(db.String(20))
+    longitude = db.Column(db.String(20))
     original = db.Column(db.String(500))
     description = db.Column(db.String(500))
     language = db.Column(db.String(3))

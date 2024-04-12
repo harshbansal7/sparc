@@ -8,11 +8,12 @@ sid = os.getenv("TWILIO_ACCOUNT_SID")
 auth = os.getenv("TWILIO_AUTH_TOKEN")
 twilio_client = Client(sid, auth)
 
-def dispatch_message_to_whatsapp(msg, contactno):
+def dispatch_message_to_whatsapp(msg, contactno, pAction=None):
     message = twilio_client.messages.create(
         from_='whatsapp:+14155238886',
         body=msg,
-        to=f"whatsapp:{contactno}"
+        persistent_action=pAction,
+        to=f"whatsapp:{contactno}",
     )
 
     if not message.error_code:

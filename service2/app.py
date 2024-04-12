@@ -94,8 +94,8 @@ def queue_complaint():
 
         complaint_db_entry = Complaint(
             complaint_category = complaint_data['complaint_category'],
-            coordinatex = complaint_data['coordinatex'],
-            coordinatey = complaint_data['coordinatey'],
+            latitude = complaint_data['latitude'],
+            longitude = complaint_data['longitude'],
             original = complaint_data['original'],
             description = complaint_data['description'],
             language = complaint_data['language'],
@@ -112,8 +112,11 @@ def queue_complaint():
         db.session.commit()
 
         message = message_helper(complaint_db_entry.id, receiver_details, complaint_data, user_data=None)
-                
-        status = dispatch_message_to_whatsapp(message, receiver_details['contactno'])
+        
+        complaint_msg = dispatch_message_to_whatsapp(message, receiver_details['contactno'])
+
+        location_information = [f"geo:{complaint_data['latitude']},{complaint_data['longitude']}|Complaint Location"]
+        location_msg = dispatch_message_to_whatsapp("Complaint Location", receiver_details['contactno'], location_information)
 
         confirmation = dispatch_message_to_whatsapp(
             f"""Your Complaint has been received by the {receiver_details["official"]} and will be responded to very shortly.\n\nYou may use this for your reference: *Complaint ID - {complaint_db_entry.id}*\n\nYou may reply to this message to give your feedback on the service.""",
@@ -137,7 +140,7 @@ def queue_complaint():
     
 
     return jsonify({
-        "status": status,
+        "status": complaint_msg,
         "allocated_to": receiver_details['official'], 
         "message": f"Complaint has been lodged with ID - {complaint_db_entry.id}. You will be contacted soon for a follow-up."
     })
@@ -147,8 +150,8 @@ def queue_complaint():
     #     id = db.Column(db.Integer, primary_key=True)
     #     # Complaint Data
     #     complaint_category = db.Column(db.String(100))
-    #     coordinatex = db.Column(db.String(20))
-    #     coordinatey = db.Column(db.String(20))
+    #     latitude = db.Column(db.String(20))
+    #     longitude = db.Column(db.String(20))
     #     original = db.Column(db.String(500))
     #     description = db.Column(db.String(500))
     #     language = db.Column(db.String(3))
@@ -165,6 +168,6 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002, debug=True)
 
 # Things left to add-
-# 1. Status of Complaint RESOLUTION Data in the Database, how do we know if it has been resolved or not.
+# 1. [DONE] Status of Complaint RESOLUTION Data in the Database, how do we know if it has been resolved or not.
 # 2. Queue Functionality
 # 3. Better way of managing complaint delivery status...still thinking
