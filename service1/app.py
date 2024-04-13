@@ -12,8 +12,8 @@ class ComplaintRequest(Form):
     useremail = StringField('useremail', [validators.Length(min=6, max=35), validators.InputRequired()])
     userphone = IntegerField('userphone', [validators.InputRequired()])
     complaint = StringField('complaint', [validators.InputRequired(), validators.Length(min=10, max=500)])
-    latitude = DecimalField('latitude', places=2)
-    longitude = DecimalField('longitude', places=2)
+    latitude = DecimalField('latitude', places=4)
+    longitude = DecimalField('longitude', places=4)
 
 class User:
     def __init__(self, name, phone, email):
@@ -81,7 +81,8 @@ class Complaint:
 @app.route('/process_complaint', methods=['POST'])
 def process_complaint():
     form = ComplaintRequest(request.form)
-    
+    print(request.form)
+
     # Check Request Data Validation
     if not form.validate():
         errors = form.errors

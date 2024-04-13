@@ -20,7 +20,7 @@ contact_info = {
     'S.P. TRAFFIC': '+918146919769',
     'CONTROL ROOM' : '+918146919769',
     'S.P. VIGILANCE' : '+918146919769',
-    'S.P. EOW' : '+918146919769s',
+    'S.P. EOW' : '+918146919769',
 }
 
 allotment = {

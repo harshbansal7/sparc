@@ -30,7 +30,7 @@ def service1_complaint_processing():
 
     queue_response = requests.post(SERVICE_2_URL + '/queue_complaint', json=response.json())
     
-    return queue_response.json()
+    return jsonify(queue_response.json()), queue_response.status_code
 
 # @app.route('/api/service2/queue-complaint')
 # def get_service2_data():
