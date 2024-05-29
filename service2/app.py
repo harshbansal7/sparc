@@ -14,13 +14,13 @@ db.init_app(app)
 MessageQueue = deque()
 
 contact_info = {
-    'S.P. CRIME' : '+918146919769',
-    'S.P. CYBER CRIME' : '+918146919769',
+    'S.P. CRIME' : '+919876762607',
+    'S.P. CYBER CRIME' : '+919876762607',
     'S.P. CRIME (JUVENILE)': '+918146919769',
     'S.P. TRAFFIC': '+918146919769',
     'CONTROL ROOM' : '+918146919769',
     'S.P. VIGILANCE' : '+918146919769',
-    'S.P. EOW' : '+918146919769',
+    'S.P. EOW' : '+919876762607',
 }
 
 allotment = {
